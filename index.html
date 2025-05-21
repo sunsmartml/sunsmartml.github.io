@@ -1,0 +1,276 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Energy Prediction</title>
+    <link rel="icon" href="sunny.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar">
+                <h3>User Input Features</h3>
+                <div class="form-group mb-3">
+                    <label for="city">City:</label>
+                    <input type="text" class="form-control" id="city" placeholder="e.g., New York">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="country">Country:</label>
+                    <input type="text" class="form-control" id="country" placeholder="e.g., USA">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="year">Select the year:</label>
+                    <select class="form-control" id="year">
+                        <option>2025</option>
+                        <option>2024</option>
+                        <option>2023</option>
+                        <option>2022</option>
+                        <option>2021</option>
+                        <option>2020</option>
+                        <option>2019</option>
+                        <option>2018</option>
+                        <option>2017</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="month">Select the month:</label>
+                    <select class="form-control" id="month">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="day">Select the day:</label>
+                    <select class="form-control" id="day">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                        <option value="28">28</option>
+                        <option value="29">29</option>
+                        <option value="30">30</option>
+                        <option value="31">31</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="hour">Select the hour:</label>
+                    <select class="form-control" id="hour">
+                         <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                    </select>
+                </div>
+                <div id="date-error" class="alert alert-danger d-none" role="alert">
+                    Invalid date selection for the chosen month/year.
+                </div>
+                <button id="generate-prediction" class="btn btn-primary w-100">Generate Prediction</button>
+                 <div id="loading-indicator" class="text-center mt-3 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Generating prediction... (this may take a minute)</p>
+                </div>
+                <div id="error-message" class="alert alert-danger mt-3 d-none" role="alert">
+                    An error occurred. Please try again.
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 main-content">
+                <h1>SunSmartML</h1>
+
+                <h2>Latest weather data based on input</h2>
+                <div id="weather-data-section" class="content-section">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Temperature (°C)</th>
+                                <th>Humidity (%)</th>
+                                <th>Pressure (hPa)</th>
+                                <th>DNI (W/m²)</th>
+                                <th>GHI (W/m²)</th>
+                                <th>GNI (W/m²)</th>
+                                <th>Solar Zenith (deg)</th>
+                                <th>Wind Speed (m/s)</th>
+                                <th>Cloud Ceiling (m)</th>
+                                <th>Visibility (km)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weather-data-tbody">
+                            <tr><td colspan="10" class="text-center">Enter location and date/time, then click "Generate Prediction".</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="prediction">Watts: <span id="predicted-power">-</span></h2>
+
+                <h2>Location viewer</h2>
+                <div id="map"></div>
+
+                <h3>Accuracy of machine learning models tested:</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Deep learning</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>LGBM</td>
+                            <td>4.1</td>
+                        </tr>
+                        <tr>
+                            <td>Random Forest</td>
+                            <td>4.2</td>
+                        </tr>
+                        <tr>
+                            <td>KNN</td>
+                            <td>4.23</td>
+                        </tr>
+                        <tr>
+                            <td>Linear Regressor</td>
+                            <td>4.45</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Feature Importance</h3>
+                <p>In our dataset, many features are important, but some contribute more significantly to the accuracy of the model than others.</p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Importance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Temperature</td>
+                            <td>0.25</td>
+                        </tr>
+                        <tr>
+                            <td>Humidity</td>
+                            <td>0.20</td>
+                        </tr>
+                        <tr>
+                            <td>Cloud.Ceiling</td>
+                            <td>0.15</td>
+                        </tr>
+                        <tr>
+                            <td>Visibility</td>
+                            <td>0.10</td>
+                        </tr>
+                        <tr>
+                            <td>Pressure</td>
+                            <td>0.08</td>
+                        </tr>
+                        <tr>
+                            <td>Wind.Speed</td>
+                            <td>0.07</td>
+                        </tr>
+                        <tr>
+                            <td>mon(cos)</td>
+                            <td>0.05</td>
+                        </tr>
+                        <tr>
+                            <td>mon(sine)</td>
+                            <td>0.05</td>
+                        </tr>
+                        <tr>
+                            <td>hr(cos)</td>
+                            <td>0.03</td>
+                        </tr>
+                        <tr>
+                            <td>hr(sine)</td>
+                            <td>0.02</td>
+                        </tr>
+                        <tr>
+                            <td>Season</td>
+                            <td>0.05</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="daily-patterns-container mt-4">
+                    <h3>Daily Power Output Patterns</h3>
+                    <img src="daily_power_patterns.png" alt="Daily Power Output Patterns" class="img-fluid">
+                    <p class="mt-2">This graph shows the typical daily power output patterns across different days of the week, highlighting peak production hours and variations.</p>
+                </div>
+
+                <h3>How solar energy output was predicted</h3>
+                <p>Using the user-provided location, date, and time, relevant weather data (Temperature, Humidity, Pressure, Wind Speed, Cloud Ceiling, Visibility) is gathered (simulated via AI). This weather data, combined with seasonal and time-based features (cosine/sine of month and hour, Season), serves as input for a pre-trained machine learning model (accessed via an API endpoint) to predict the solar energy output (PolyPwr) in watts.</p>
+
+                 <h2 class="section-header">Impact and Applications</h2>
+                <p>Accurate solar energy prediction is crucial for optimizing renewable energy systems. It helps utilities manage grid load, allows solar farm operators to forecast generation, and aids consumers in planning energy usage. By providing insights into expected solar output based on specific location and time conditions, this tool contributes to more efficient and reliable utilization of solar power.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
